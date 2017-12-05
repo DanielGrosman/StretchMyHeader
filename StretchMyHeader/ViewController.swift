@@ -11,6 +11,9 @@ import UIKit
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var dateLabel: UILabel!
+    let today = Date(timeInterval: 0, since: Date())
+    let formatter = DateFormatter ()
     
     let items = [
         NewsItem(category: .World, summary: "Climate change protests, divestments meet fossil fuel realities"),
@@ -27,20 +30,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.delegate = self
+        
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 90
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         
+        headerView = tableView.tableHeaderView
         tableView.tableHeaderView = nil
         tableView.addSubview(headerView)
         
-        tableView.contentInset = UIEdgeInsets(top: kTableHeaderHeight, left: 0, bottom: 0, right: 0)
-        tableView.contentOffset = CGPoint(x: 0, y: -kTableHeaderHeight)
+        tableView.contentInset = UIEdgeInsetsMake(kTableHeaderHeight, 0, 0, 0)
+        tableView.contentOffset = CGPoint(x:0, y: -kTableHeaderHeight)
+        
+        formatter.dateFormat = "MMMM dd"
+        dateLabel.text = formatter.string(from: today)
+        
         updateHeaderView()
     }
     
     func updateHeaderView () {
-        var headerRect = CGRect(x:0, y:-kTableHeaderHeight, width:tableView.bounds.width, height:kTableHeaderHeight)
+        var headerRect = CGRect(x: 0, y: -kTableHeaderHeight, width: tableView.bounds.width, height: kTableHeaderHeight)
         if tableView.contentOffset.y < -kTableHeaderHeight {
             headerRect.origin.y = tableView.contentOffset.y
             headerRect.size.height = -tableView.contentOffset.y
@@ -52,13 +62,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return true
     }
     
-    //Mark: UIScrollViewDelegate
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateHeaderView()
     }
-
-    //Mark: UITableViewDataSource
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -70,13 +76,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? CustomTableViewCell else {
-            fatalError("The dequeued cell is not an instance of MealTableViewCell.")
+            fatalError("The dequeued cell is not an instance of CustomTableViewCell.")
         }
         let item = items[indexPath.row]
         cell.newsItem = item
         return cell
     }
-
+    
     
 }
 
